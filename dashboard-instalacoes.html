@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard GoInternet</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #020617;
+      --bg-secondary: #0f172a;
+      --bg-card: #1e293b;
+      --border-color: rgba(255,255,255,.08);
+      --text-primary: #fff;
+      --text-secondary: #94a3b8;
+      --accent-orange: #ff6d0b;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --sidebar-width: 230px;
+      --header-height: 68px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      padding: 20px 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px;
+      margin-bottom: 28px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-orange);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 12px;
+    }
+
+    .menu-item {
+      text-decoration: none;
+      color: var(--text-secondary);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-item.active,
+    .menu-item:hover {
+      background: rgba(255,109,11,.12);
+      color: #fff;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      height: var(--header-height);
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      z-index: 99;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,.05);
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .filter-btn, .panel-btn, .btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: .2s;
+    }
+
+    .filter-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .filter-btn.active {
+      background: var(--accent-orange);
+      color: #fff;
+    }
+
+    .panel-btn {
+      padding: 9px 14px;
+      border-radius: 10px;
+      background: rgba(255,109,11,.12);
+      color: var(--accent-orange);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .panel-btn:hover {
+      background: rgba(255,109,11,.2);
+    }
+
+    .main-content {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--header-height);
+      padding: 24px;
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .kpi-card::before {
+      content:'';
+      position:absolute;
+      top:0; left:0; right:0;
+      height: 3px;
+      background: var(--accent-orange);
+      border-radius: 14px 14px 0 0;
+    }
+
+    .kpi-card.green::before { background: var(--accent-green); }
+    .kpi-card.blue::before { background: var(--accent-blue); }
+    .kpi-card.yellow::before { background: var(--accent-yellow); }
+    .kpi-card.purple::before { background: var(--accent-purple); }
+
+    .kpi-header {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .kpi-icon {
+      font-size: 28px;
+      opacity: .9;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .panel.full-width {
+      grid-column: span 2;
+    }
+
+    .panel-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .chart-container {
+      height: 280px;
+      position: relative;
+    }
+
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ranking-item {
+      background: #022242;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .ranking-info {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .ranking-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .ranking-details {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .ranking-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent-blue);
+    }
+
+    .table-container {
+      overflow:auto;
+    }
+
+    .data-table {
+      width:100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    .data-table thead {
+      background: rgba(255,255,255,.04);
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px 10px;
+      text-align:left;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      font-size: 13px;
+    }
+
+    .data-table th {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-badge {
+      display:inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .status-badge.agendada { background: rgba(59,130,246,.18); color: #60a5fa; }
+    .status-badge.em_andamento { background: rgba(139,92,246,.18); color: #c4b5fd; }
+    .status-badge.instalada,
+    .status-badge.concluida { background: rgba(16,185,129,.18); color: #34d399; }
+    .status-badge.reagendada { background: rgba(245,158,11,.18); color: #fbbf24; }
+    .status-badge.cancelada { background: rgba(239,68,68,.18); color: #f87171; }
+
+    .table-btn {
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      color: #fff;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    .table-btn:hover { background: rgba(255,109,11,.15); }
+    .table-btn.delete:hover { background: rgba(239,68,68,.15); }
+
+    .form-select, .form-input, .form-textarea {
+      width:100%;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--border-color);
+      border-radius:10px;
+      color:#fff;
+      font-size:14px;
+    }
+
+    .form-select option {
+      color:#111827;
+    }
+
+    .form-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .modal {
+      display:none;
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,.75);
+      z-index:999;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+    }
+
+    .modal.active { display:flex; }
+
+    .modal-content {
+      background: var(--bg-card);
+      border:1px solid var(--border-color);
+      border-radius: 16px;
+      width:min(760px,100%);
+      padding: 22px;
+      max-height: 92vh;
+      overflow:auto;
+    }
+
+    .modal-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:10px;
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      cursor:pointer;
+      font-size:18px;
+    }
+
+    .form-grid {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      display:block;
+      margin-bottom:8px;
+      font-size:13px;
+      color: var(--text-secondary);
+      font-weight:700;
+    }
+
+    .form-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      color:#fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.08);
+      color:#fff;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #0f172a;
+      color:#fff;
+      border:1px solid var(--border-color);
+      display:none;
+      z-index: 2000;
+      min-width: 240px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    .toast.show { display:block; }
+    .toast.success { border-color: var(--accent-green); background: #0f2f23; }
+    .toast.error { border-color: var(--accent-red); background: #2f0f0f; }
+
+    .loading {
+      position: fixed;
+      inset:0;
+      background: rgba(2,6,23,.65);
+      z-index: 1500;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .loading.active { display:flex; }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,.15);
+      border-top-color: var(--accent-orange);
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg);} }
+
+    @media (max-width: 1100px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .panel.full-width { grid-column: span 1; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display:none; }
+      .header { left:0; }
+      .main-content { margin-left:0; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>🌐</span>
+      <span>GoInternet</span>
+    </div>
+
+    <nav class="sidebar-menu">
+      <a href="#" class="menu-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+      <a href="#" class="menu-item"><i class="fa-solid fa-calendar-days"></i> Agenda</a>
+      <a href="#" class="menu-item"><i class="fa-solid fa-screwdriver-wrench"></i> OS</a>
+      <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Equipe</a>
+    </nav>
+  </aside>
+
+  <header class="header">
+    <div class="page-title">Dashboard de Instalações e OS</div>
+
+    <div class="header-right">
+      <div class="filter-group">
+        <button class="filter-btn active" data-period="dia">Dia</button>
+        <button class="filter-btn" data-period="semana">Semana</button>
+        <button class="filter-btn" data-period="mes">Mês</button>
+        <button class="filter-btn" data-period="ano">Ano</button>
+      </div>
+
+      <button class="panel-btn" id="btnSincronizar">
+        <i class="fa-solid fa-rotate-right"></i> Sincronizar
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="kpi-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-header">
+          <div>
+            <div class="kpi-title">Instalações Agendadas</div>
+            <div class="kpi-value" id="kpi-agendadas">0</div>
+            <div class="kpi-label">no período</div>
+          </div>
+          <div class="kpi-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+      </div>
+
+      <div class="kpi-card green">
+        <div class="kpi-header">
+          <div>
+            <div class="kpi-title">Instalações Realizadas</div>
+            <div class="kpi-value" id="kpi-realizadas">0</div>
+            <div class="kpi-label">concluídas no período</div>
+          </div>
+          <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-header">
+          <div>
+            <div class="kpi-title">OS Concluídas</div>
+            <div class="kpi-value" id="kpi-os">0</div>
+            <div class="kpi-label">ordens de serviço</div>
+          </div>
+          <div class="kpi-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        </div>
+      </div>
+
+      <div class="kpi-card yellow">
+        <div class="kpi-header">
+          <div>
+            <div class="kpi-title">Reagendamentos</div>
+            <div class="kpi-value" id="kpi-reagendamentos">0</div>
+            <div class="kpi-label">no período</div>
+          </div>
+          <div class="kpi-icon"><i class="fa-solid fa-rotate"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Instalações por Período</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="instalacoesChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Reagendamentos por Motivo</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="motivosChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Ranking de Vendedores</div>
+        </div>
+        <div class="ranking-list" id="rankingVendedores"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Ranking de Técnicos</div>
+          <select class="form-select" id="filterTecnico" style="width:auto; min-width:180px;">
+            <option value="instalacoes">Instalações</option>
+            <option value="manutencoes">Ordens de Serviço</option>
+            <option value="total">Todas Atividades</option>
+          </select>
+        </div>
+        <div class="ranking-list" id="rankingTecnicos"></div>
+      </div>
+
+      <div class="panel full-width">
+        <div class="panel-header">
+          <div class="panel-title">Acompanhamento de Registros</div>
+          <button class="panel-btn" id="btnNovoRegistro">
+            <i class="fa-solid fa-plus"></i> Novo Registro
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Tipo OS</th>
+                <th>Cliente</th>
+                <th>Vendedor</th>
+                <th>Técnico</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Motivo</th>
+                <th>Observações</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="instalacoesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modalEdit">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitleText">Novo Registro</h2>
+        <button class="modal-close" type="button" id="btnCloseModal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" id="edit-id">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Categoria *</label>
+            <select class="form-select" id="edit-categoria" required>
+              <option value="instalacao">Instalação</option>
+              <option value="ordem_servico">Ordem de Serviço</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="tipoOsGroup" style="display:none;">
+            <label class="form-label">Tipo da OS</label>
+            <select class="form-select" id="edit-tipo-os">
+              <option value="">Selecione...</option>
+              <option value="Ordem">Ordem</option>
+              <option value="Reparo sem conexão">Reparo sem conexão</option>
+              <option value="Configuração de roteador">Configuração de roteador</option>
+              <option value="Mudança de endereço">Mudança de endereço</option>
+              <option value="Mudança de titularidade">Mudança de titularidade</option>
+              <option value="Migração">Migração</option>
+              <option value="Troca de cabeamento">Troca de cabeamento</option>
+              <option value="Troca de roteador">Troca de roteador</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cliente *</label>
+            <input type="text" class="form-input" id="edit-cliente" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vendedor</label>
+            <input type="text" class="form-input" id="edit-vendedor">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Técnico *</label>
+            <input type="text" class="form-input" id="edit-tecnico" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Data *</label>
+            <input type="date" class="form-input" id="edit-data" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Status *</label>
+            <select class="form-select" id="edit-status" required>
+              <option value="agendada">Agendada</option>
+              <option value="em_andamento">Em andamento</option>
+              <option value="instalada">Instalada</option>
+              <option value="concluida">Concluída</option>
+              <option value="reagendada">Reagendada</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Motivo</label>
+            <input type="text" class="form-input" id="edit-motivo" placeholder="Ex: Cliente ausente">
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">Observações</label>
+            <textarea class="form-textarea" id="edit-obs" placeholder="Detalhes adicionais..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSalvarForm">
+            <i class="fa-solid fa-save"></i> Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>Carregando...</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // URL da API do Google Apps Script
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyt9qhGCBIZWOSm29PikznkBMcVfJwqrDbOlvB1PTuEJE_924_crdjH90n-PaNwS5Kbrg/exec';
+
+    // Estado da aplicação
+    let registros = [];
+    let periodoAtual = 'dia';
+    let chartInstalacoes = null;
+    let chartMotivos = null;
+
+    // Elementos DOM
+    const modalEdit = document.getElementById('modalEdit');
+    const modalTitleText = document.getElementById('modalTitleText');
+    const btnNovoRegistro = document.getElementById('btnNovoRegistro');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnCancelarModal = document.getElementById('btnCancelarModal');
+    const btnSalvarForm = document.getElementById('btnSalvarForm');
+    const form = document.getElementById('editForm');
+    const loading = document.getElementById('loading');
+    const toast = document.getElementById('toast');
+    const filterTecnico = document.getElementById('filterTecnico');
+    const editCategoria = document.getElementById('edit-categoria');
+    const tipoOsGroup = document.getElementById('tipoOsGroup');
+
+    /* ============================================
+       FUNÇÕES AUXILIARES - UI
+    ============================================ */
+    
+    function showLoading() {
+      loading.classList.add('active');
+    }
+
+    function hideLoading() {
+      loading.classList.remove('active');
+    }
+
+    function showToast(msg, type = 'info') {
+      toast.textContent = msg;
+      toast.className = 'toast show';
+      if (type === 'success') toast.classList.add('success');
+      if (type === 'error') toast.classList.add('error');
+      
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    function openModal() {
+      modalEdit.classList.add('active');
+    }
+
+    function closeModal() {
+      modalEdit.classList.remove('active');
+    }
+
+    function limparFormulario() {
+      form.reset();
+      document.getElementById('edit-id').value = '';
+      document.getElementById('edit-categoria').value = 'instalacao';
+      modalTitleText.textContent = 'Novo Registro';
+      alternarTipoOS();
+    }
+
+    function alternarTipoOS() {
+      const categoria = editCategoria.value;
+      tipoOsGroup.style.display = categoria === 'ordem_servico' ? 'block' : 'none';
+      
+      const tipoOsSelect = document.getElementById('edit-tipo-os');
+      if (categoria !== 'ordem_servico') {
+        tipoOsSelect.value = '';
+        tipoOsSelect.removeAttribute('required');
+      } else {
+        tipoOsSelect.setAttribute('required', 'required');
+      }
+    }
+
+    /* ============================================
+       FUNÇÕES AUXILIARES - DATAS
+    ============================================ */
+    
+    function toDateOnly(value) {
+      if (!value) return null;
+      
+      // Se já é um objeto Date
+      if (value instanceof Date) {
+        const d = new Date(value);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      }
+      
+      // Se é uma string
+      const dateStr = String(value).trim();
+      if (!dateStr) return null;
+      
+      // Tenta parsear a data (formato YYYY-MM-DD ou DD/MM/YYYY)
+      let d;
+      if (dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split('/');
+        d = new Date(year, month - 1, day);
+      } else {
+        d = new Date(dateStr + 'T00:00:00');
+      }
+      
+      if (isNaN(d.getTime())) return null;
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function isSameDay(a, b) {
+      if (!a || !b) return false;
+      return a.getFullYear() === b.getFullYear() &&
+             a.getMonth() === b.getMonth() &&
+             a.getDate() === b.getDate();
+    }
+
+    function startOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function endOfWeek(date) {
+      const d = startOfWeek(date);
+      d.setDate(d.getDate() + 6);
+      d.setHours(23, 59, 59, 999);
+      return d;
+    }
+
+    function filtrarPorPeriodo(lista) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      return lista.filter(item => {
+        const data = toDateOnly(item.data);
+        if (!data) return false;
+
+        if (periodoAtual === 'dia') {
+          return isSameDay(data, hoje);
+        }
+
+        if (periodoAtual === 'semana') {
+          return data >= startOfWeek(hoje) && data <= endOfWeek(hoje);
+        }
+
+        if (periodoAtual === 'mes') {
+          return data.getMonth() === hoje.getMonth() && 
+                 data.getFullYear() === hoje.getFullYear();
+        }
+
+        if (periodoAtual === 'ano') {
+          return data.getFullYear() === hoje.getFullYear();
+        }
+
+        return true;
+      });
+    }
+
+    /* ============================================
+       FUNÇÕES DE API
+    ============================================ */
+    
+    async function apiListar() {
+      try {
+        const resp = await fetch(`${API_URL}?action=list&t=${Date.now()}`);
+        
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        
+        const data = await resp.json();
+        console.log('✅ Dados recebidos:', data);
+        return data;
+      } catch (error) {
+        console.error('❌ Erro ao listar:', error);
+        throw error;
+      }
+    }
+
+    async function apiSalvar(payload) {
+      try {
+        console.log('📤 Enviando dados:', payload);
+        
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Importante para Google Apps Script
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', payload })
+        });
+        
+        // Com no-cors, não conseguimos ler a resposta
+        // Assumimos sucesso se não houver erro de rede
+        console.log('✅ Dados enviados (no-cors mode)');
+        return { ok: true };
+        
+      } catch (error) {
+        console.error('❌ Erro ao salvar:', error);
+        throw error;
+      }
+    }
+
+    async function apiExcluir(id) {
+      try {
+        console.log('🗑️ Excluindo ID:', id);
+        
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', id })
+        });
+        
+        console.log('✅ Exclusão enviada (no-cors mode)');
+        return { ok: true };
+        
+      } catch (error) {
+        console.error('❌ Erro ao excluir:', error);
+        throw error;
+      }
+    }
+
+    /* ============================================
+       FUNÇÃO PRINCIPAL DE CARREGAMENTO
+    ============================================ */
+    
+    async function carregarDados() {
+      try {
+        showLoading();
+        const res = await apiListar();
+        
+        if (res && Array.isArray(res.data)) {
+          registros = res.data;
+          console.log(`📊 ${registros.length} registros carregados`);
+        } else {
+          registros = [];
+          console.warn('⚠️ Dados inválidos recebidos');
+        }
+        
+        renderizarTudo();
+        showToast('Dados carregados com sucesso', 'success');
+        
+      } catch (e) {
+        console.error('❌ Erro completo:', e);
+        showToast('Erro ao carregar dados. Verifique o console.', 'error');
+        registros = [];
+        renderizarTudo();
+      } finally {
+        hideLoading();
+      }
+    }
+
+    /* ============================================
+       RENDERIZAÇÃO
+    ============================================ */
+    
+    function renderizarTudo() {
+      const dados = filtrarPorPeriodo(registros);
+      atualizarKPIs(dados);
+      atualizarTabela(dados);
+      atualizarRankingVendedores(dados);
+      atualizarRankingTecnicos(dados, filterTecnico.value);
+      atualizarGraficoInstalacoes(dados);
+      atualizarGraficoMotivos(dados);
+    }
+
+    function atualizarKPIs(dados) {
+      const instalacoes = dados.filter(r => r.categoria === 'instalacao');
+      const os = dados.filter(r => r.categoria === 'ordem_servico');
+
+      const agendadas = instalacoes.filter(r => r.status === 'agendada').length;
+      const realizadas = instalacoes.filter(r => ['instalada','concluida'].includes(r.status)).length;
+      const osConcluidas = os.filter(r => ['instalada','concluida'].includes(r.status)).length;
+      const reagendamentos = dados.filter(r => r.status === 'reagendada').length;
+
+      document.getElementById('kpi-agendadas').textContent = agendadas;
+      document.getElementById('kpi-realizadas').textContent = realizadas;
+      document.getElementById('kpi-os').textContent = osConcluidas;
+      document.getElementById('kpi-reagendamentos').textContent = reagendamentos;
+    }
+
+    function atualizarTabela(dados) {
+      const tbody = document.getElementById('instalacoesTableBody');
+      tbody.innerHTML = '';
+
+      const ordenados = [...dados].sort((a,b) => {
+        const dataA = toDateOnly(a.data);
+        const dataB = toDateOnly(b.data);
+        return (dataB || 0) - (dataA || 0);
+      });
+
+      if (!ordenados.length) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:40px;">Nenhum registro encontrado no período selecionado.</td></tr>`;
+        return;
+      }
+
+      ordenados.forEach(item => {
+        const tr = document.createElement('tr');
+        const statusClass = String(item.status || '').replace(/\s+/g, '_');
+        const dataFormatada = item.data ? toDateOnly(item.data).toLocaleDateString('pt-BR') : '-';
+
+        tr.innerHTML = `
+          <td>${item.id || '-'}</td>
+          <td>${item.categoria === 'ordem_servico' ? 'Ordem de Serviço' : 'Instalação'}</td>
+          <td>${item.tipo_os || '-'}</td>
+          <td>${item.cliente || '-'}</td>
+          <td>${item.vendedor || '-'}</td>
+          <td>${item.tecnico || '-'}</td>
+          <td>${dataFormatada}</td>
+          <td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
+          <td>${item.motivo || '-'}</td>
+          <td>${item.obs || '-'}</td>
+          <td>
+            <button class="table-btn" onclick="editarRegistro('${item.id}')">
+              <i class="fa-solid fa-pen"></i> Editar
+            </button>
+            <button class="table-btn delete" onclick="removerRegistro('${item.id}')">
+              <i class="fa-solid fa-trash"></i> Excluir
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function atualizarRankingVendedores(dados) {
+      const container = document.getElementById('rankingVendedores');
+      container.innerHTML = '';
+
+      const mapa = {};
+      dados.filter(r => r.categoria === 'instalacao').forEach(r => {
+        const nome = r.vendedor || 'Não informado';
+        if (!mapa[nome]) mapa[nome] = { nome, realizadas: 0, naoRealizadas: 0 };
+        if (['instalada','concluida'].includes(r.status)) {
+          mapa[nome].realizadas++;
+        } else {
+          mapa[nome].naoRealizadas++;
+        }
+      });
+
+      const ranking = Object.values(mapa).sort((a,b) => b.realizadas - a.realizadas).slice(0, 5);
+
+      if (!ranking.length) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Nenhum dado disponível.</div>';
+        return;
+      }
+
+      ranking.forEach(v => {
+        const total = v.realizadas + v.naoRealizadas;
+        const taxa = total ? ((v.realizadas / total) * 100).toFixed(1) : '0.0';
+
+        container.innerHTML += `
+          <div class="ranking-item">
+            <div class="ranking-info">
+              <div class="ranking-name"><i class="fa-solid fa-user-tie"></i> ${v.nome}</div>
+              <div class="ranking-details">
+                <i class="fa-solid fa-check-circle" style="color:#10b981"></i> ${v.realizadas} 
+                | 
+                <i class="fa-solid fa-times-circle" style="color:#ef4444"></i> ${v.naoRealizadas}
+              </div>
+            </div>
+            <div class="ranking-value">${taxa}%</div>
+          </div>
+        `;
+      });
+    }
+
+    function atualizarRankingTecnicos(dados, tipo='instalacoes') {
+      const container = document.getElementById('rankingTecnicos');
+      container.innerHTML = '';
+
+      const mapa = {};
+      dados.forEach(r => {
+        const nome = r.tecnico || 'Não informado';
+        if (!mapa[nome]) mapa[nome] = { nome, atividades: 0 };
+
+        const concluido = ['instalada','concluida'].includes(r.status);
+        const ehInst = r.categoria === 'instalacao';
+        const ehOS = r.categoria === 'ordem_servico';
+
+        if (tipo === 'instalacoes' && ehInst && concluido) mapa[nome].atividades++;
+        if (tipo === 'manutencoes' && ehOS && concluido) mapa[nome].atividades++;
+        if (tipo === 'total' && concluido) mapa[nome].atividades++;
+      });
+
+      const ranking = Object.values(mapa).sort((a,b) => b.atividades - a.atividades).slice(0, 5);
+
+      if (!ranking.length) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Nenhum dado disponível.</div>';
+        return;
+      }
+
+      ranking.forEach(t => {
+        container.innerHTML += `
+          <div class="ranking-item">
+            <div class="ranking-info">
+              <div class="ranking-name"><i class="fa-solid fa-user-gear"></i> ${t.nome}</div>
+              <div class="ranking-details">${t.atividades} atividades concluídas</div>
+            </div>
+            <div class="ranking-value">${t.atividades}</div>
+          </div>
+        `;
+      });
+    }
+
+    function atualizarGraficoInstalacoes(dados) {
+      const base = dados.filter(r => r.categoria === 'instalacao' && ['instalada','concluida'].includes(r.status));
+      let labels = [];
+      let valores = [];
+
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      if (periodoAtual === 'dia') {
+        labels = ['Hoje'];
+        valores = [base.filter(r => isSameDay(toDateOnly(r.data), hoje)).length];
+      } else if (periodoAtual === 'semana') {
+        labels = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+        const inicio = startOfWeek(hoje);
+        valores = [];
+        for (let i = 0; i < 7; i++) {
+          const dia = new Date(inicio);
+          dia.setDate(inicio.getDate() + i);
+          valores.push(base.filter(r => isSameDay(toDateOnly(r.data), dia)).length);
+        }
+      } else if (periodoAtual === 'mes') {
+        labels = ['Sem1','Sem2','Sem3','Sem4','Sem5'];
+        valores = [0,0,0,0,0];
+        base.forEach(r => {
+          const d = toDateOnly(r.data);
+          if (!d) return;
+          const idx = Math.min(Math.floor((d.getDate() - 1) / 7), 4);
+          valores[idx]++;
+        });
+      } else {
+        labels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        valores = Array(12).fill(0);
+        base.forEach(r => {
+          const d = toDateOnly(r.data);
+          if (!d) return;
+          valores[d.getMonth()]++;
+        });
+      }
+
+      const ctx = document.getElementById('instalacoesChart');
+
+      if (chartInstalacoes) chartInstalacoes.destroy();
+
+      chartInstalacoes = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Instalações Realizadas',
+            data: valores,
+            backgroundColor: '#10b981',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display:false } },
+          scales: {
+            x: { ticks: { color:'#94a3b8' }, grid: { display:false }},
+            y: { ticks: { color:'#94a3b8', precision:0 }, grid: { color:'#334155' }, beginAtZero:true }
+          }
+        }
+      });
+    }
+
+    function atualizarGraficoMotivos(dados) {
+      const mapa = {};
+
+      dados.filter(r => r.status === 'reagendada').forEach(r => {
+        const motivo = (r.motivo || 'Não informado').trim();
+        mapa[motivo] = (mapa[motivo] || 0) + 1;
+      });
+
+      const labels = Object.keys(mapa).length ? Object.keys(mapa) : ['Sem dados'];
+      const valores = Object.keys(mapa).length ? Object.values(mapa) : [1];
+
+      const ctx = document.getElementById('motivosChart');
+
+      if (chartMotivos) chartMotivos.destroy();
+
+      chartMotivos = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position:'bottom',
+              labels: { color:'#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    /* ============================================
+       FUNÇÕES DE EDIÇÃO/EXCLUSÃO
+    ============================================ */
+    
+    function editarRegistro(id) {
+      const item = registros.find(r => String(r.id) === String(id));
+      if (!item) {
+        showToast('Registro não encontrado', 'error');
+        return;
+      }
+
+      modalTitleText.textContent = 'Editar Registro';
+      document.getElementById('edit-id').value = item.id || '';
+      document.getElementById('edit-categoria').value = item.categoria || 'instalacao';
+      document.getElementById('edit-tipo-os').value = item.tipo_os || '';
+      document.getElementById('edit-cliente').value = item.cliente || '';
+      document.getElementById('edit-vendedor').value = item.vendedor || '';
+      document.getElementById('edit-tecnico').value = item.tecnico || '';
+      document.getElementById('edit-data').value = item.data || '';
+      document.getElementById('edit-status').value = item.status || 'agendada';
+      document.getElementById('edit-motivo').value = item.motivo || '';
+      document.getElementById('edit-obs').value = item.obs || '';
+
+      alternarTipoOS();
+      openModal();
+    }
+
+    async function removerRegistro(id) {
+      if (!confirm('⚠️ Deseja realmente excluir este registro?\n\nEsta ação não poderá ser desfeita.')) {
+        return;
+      }
+
+      try {
+        showLoading();
+        await apiExcluir(id);
+        showToast('Registro excluído com sucesso', 'success');
+        
+        // Aguarda 2 segundos antes de recarregar (tempo para o Google Sheets processar)
+        setTimeout(async () => {
+          await carregarDados();
+        }, 2000);
+        
+      } catch (e) {
+        console.error('❌ Erro ao excluir:', e);
+        showToast('Erro ao excluir. Tente novamente.', 'error');
+        hideLoading();
+      }
+    }
+
+    // Expor funções globalmente
+    window.editarRegistro = editarRegistro;
+    window.removerRegistro = removerRegistro;
+
+    /* ============================================
+       EVENT LISTENERS
+    ============================================ */
+    
+    btnNovoRegistro.addEventListener('click', () => {
+      limparFormulario();
+      openModal();
+    });
+
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCancelarModal.addEventListener('click', closeModal);
+
+    editCategoria.addEventListener('change', alternarTipoOS);
+
+    filterTecnico.addEventListener('change', () => {
+      renderizarTudo();
+    });
+
+    document.getElementById('btnSincronizar').addEventListener('click', carregarDados);
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        periodoAtual = btn.dataset.period;
+        renderizarTudo();
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validação adicional
+      const categoria = document.getElementById('edit-categoria').value;
+      const tipoOs = document.getElementById('edit-tipo-os').value;
+      
+      if (categoria === 'ordem_servico' && !tipoOs) {
+        showToast('Por favor, selecione o tipo da Ordem de Serviço', 'error');
+        return;
+      }
+
+      const payload = {
+        id: document.getElementById('edit-id').value || '',
+        categoria: categoria,
+        tipo_os: tipoOs,
+        cliente: document.getElementById('edit-cliente').value.trim(),
+        vendedor: document.getElementById('edit-vendedor').value.trim(),
+        tecnico: document.getElementById('edit-tecnico').value.trim(),
+        data: document.getElementById('edit-data').value,
+        status: document.getElementById('edit-status').value,
+        motivo: document.getElementById('edit-motivo').value.trim(),
+        obs: document.getElementById('edit-obs').value.trim()
+      };
+
+      // Validações
+      if (!payload.cliente) {
+        showToast('Nome do cliente é obrigatório', 'error');
+        return;
+      }
+
+      if (!payload.tecnico) {
+        showToast('Nome do técnico é obrigatório', 'error');
+        return;
+      }
+
+      if (!payload.data) {
+        showToast('Data é obrigatória', 'error');
+        return;
+      }
+
+      try {
+        showLoading();
+        btnSalvarForm.disabled = true;
+        
+        console.log('💾 Salvando registro:', payload);
+        await apiSalvar(payload);
+        
+        closeModal();
+        showToast('Registro salvo com sucesso! Atualizando dados...', 'success');
+        
+        // Aguarda 2 segundos antes de recarregar (tempo para o Google Sheets processar)
+        setTimeout(async () => {
+          await carregarDados();
+          btnSalvarForm.disabled = false;
+        }, 2000);
+        
+      } catch (e) {
+        console.error('❌ Erro detalhado:', e);
+        showToast(`Erro ao salvar: ${e.message || 'Erro desconhecido'}`, 'error');
+        btnSalvarForm.disabled = false;
+        hideLoading();
+      }
+    });
+
+    /* ============================================
+       INICIALIZAÇÃO
+    ============================================ */
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Iniciando aplicação...');
+      alternarTipoOS();
+      carregarDados();
+    });
+  </script>
+</body>
+</html>

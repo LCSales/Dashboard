@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Carregando...</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background: linear-gradient(135deg,#020617,#0f172a,#1e3a8a);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+height:100vh;
+font-family:'Segoe UI',sans-serif;
+color:white;
+overflow:hidden;
+}
+
+/* canvas fundo IA */
+
+#rede{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+.logo{
+font-size:2.5rem;
+font-weight:800;
+color:#e24b1d;
+margin-bottom:10px;
+letter-spacing:2px;
+animation:fadeDown 0.8s ease forwards;
+}
+
+.bemvindo{
+font-size:1.6rem;
+font-weight:600;
+color:#ffffff;
+margin-bottom:40px;
+opacity:0;
+animation:fadeIn 1s ease 0.5s forwards;
+}
+
+.bemvindo span{
+color:#00e5ff;
+}
+
+.card{
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.15);
+border-radius:16px;
+padding:30px 40px;
+text-align:center;
+width:90%;
+max-width:480px;
+backdrop-filter:blur(10px);
+opacity:0;
+animation:fadeIn 1s ease 1s forwards;
+}
+
+.status-icon{
+font-size:3rem;
+margin-bottom:12px;
+animation:pulse 1.2s infinite;
+}
+
+.frase{
+font-size:1.1rem;
+color:#b0bec5;
+min-height:32px;
+transition:opacity 0.4s ease;
+}
+
+.frase.ativo{
+color:#00e5ff;
+font-weight:600;
+}
+
+.barra-container{
+margin-top:24px;
+background:rgba(255,255,255,0.1);
+border-radius:50px;
+height:8px;
+width:100%;
+overflow:hidden;
+}
+
+.barra{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#00e5ff,#7c4dff);
+border-radius:50px;
+transition:width 0.3s ease;
+}
+
+.porcentagem{
+margin-top:10px;
+font-size:0.9rem;
+color:#90a4ae;
+}
+
+/* partículas decorativas */
+
+.particula{
+position:absolute;
+width:6px;
+height:6px;
+border-radius:50%;
+background:#ff6d0b;
+opacity:0.3;
+box-shadow:
+0 0 6px #ff6d0b,
+0 0 12px #ff6d0b;
+animation:flutuar 3s infinite ease-in-out;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes fadeDown{
+from{opacity:0;transform:translateY(-20px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(1);}
+50%{transform:scale(1.2);}
+}
+
+@keyframes flutuar{
+0%,100%{transform:translateY(0px);}
+50%{transform:translateY(-20px);}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="rede"></canvas>
+
+<div class="particula" style="top:10%; left:8%; animation-delay:0s;"></div>
+<div class="particula" style="top:20%; left:90%; animation-delay:1s;"></div>
+<div class="particula" style="top:80%; left:15%; animation-delay:2s;"></div>
+<div class="particula" style="top:70%; left:85%; animation-delay:0.5s;"></div>
+<div class="particula" style="top:50%; left:5%; animation-delay:1.5s;"></div>
+
+<div class="logo">GoInternet</div>
+<div class="bemvindo">Bem-vindo, <span>Suporte</span></div>
+
+<div class="card">
+
+<div class="status-icon"></div>
+
+<div class="frase" id="frase">Carregando dados...</div>
+
+<div class="barra-container">
+<div class="barra" id="barra"></div>
+</div>
+
+<div class="porcentagem" id="porcentagem">0%</div>
+
+</div>
+
+<script>
+
+/* proteção login */
+
+if(localStorage.getItem("login")!=="true"){
+window.location="index.html";
+}
+
+/* frases loader */
+
+const frases=[
+"Carregando dados do sistema...",
+"Sincronizando pedidos e downloads...",
+"Verificando relatório de vendas...",
+"Carregando painel de controle...",
+"Iniciando módulo de promoções...",
+"Baixando atualizações do servidor...",
+"Calculando métricas de conversão...",
+"Removendo emendas na fibra...",
+"Tudo pronto! Redirecionando..."
+];
+
+const fraseEl=document.getElementById("frase");
+const barraEl=document.getElementById("barra");
+const porcEl=document.getElementById("porcentagem");
+
+let index=0;
+const totalFrases=frases.length;
+
+function proximaFrase(){
+
+fraseEl.style.opacity="0";
+
+setTimeout(()=>{
+
+fraseEl.innerText=frases[index];
+fraseEl.classList.add("ativo");
+fraseEl.style.opacity="1";
+
+const porcento=Math.round(((index+1)/totalFrases)*100);
+
+barraEl.style.width=porcento+"%";
+porcEl.innerText=porcento+"%";
+
+index++;
+
+if(index<totalFrases){
+
+setTimeout(proximaFrase,900);
+
+}else{
+
+setTimeout(()=>{
+
+window.location="dashboard-instalacoes.html";
+
+},800);
+
+}
+
+},300);
+
+}
+
+setTimeout(proximaFrase,1200);
+
+
+/* efeito rede IA */
+
+const canvas=document.getElementById("rede");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const particulas=[];
+const quantidade=60;
+
+class Particula{
+
+constructor(){
+
+this.x=Math.random()*canvas.width;
+this.y=Math.random()*canvas.height;
+
+this.vx=(Math.random()-0.5)*0.7;
+this.vy=(Math.random()-0.5)*0.7;
+
+this.size=2+Math.random()*3;
+
+}
+
+mover(){
+
+this.x+=this.vx;
+this.y+=this.vy;
+
+if(this.x<0 || this.x>canvas.width) this.vx*=-1;
+if(this.y<0 || this.y>canvas.height) this.vy*=-1;
+
+}
+
+desenhar(){
+
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+ctx.fillStyle="#ff6d0b";
+ctx.fill();
+
+}
+
+}
+
+for(let i=0;i<quantidade;i++){
+
+particulas.push(new Particula());
+
+}
+
+function conectar(){
+
+for(let a=0;a<particulas.length;a++){
+
+for(let b=a;b<particulas.length;b++){
+
+let dx=particulas[a].x-particulas[b].x;
+let dy=particulas[a].y-particulas[b].y;
+
+let dist=Math.sqrt(dx*dx+dy*dy);
+
+if(dist<120){
+
+ctx.strokeStyle="rgba(255,109,11,0.15)";
+ctx.lineWidth=1;
+
+ctx.beginPath();
+ctx.moveTo(particulas[a].x,particulas[a].y);
+ctx.lineTo(particulas[b].x,particulas[b].y);
+ctx.stroke();
+
+}
+
+}
+
+}
+
+}
+
+function animar(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+for(let p of particulas){
+
+p.mover();
+p.desenhar();
+
+}
+
+conectar();
+
+requestAnimationFrame(animar);
+
+}
+
+animar();
+
+</script>
+
+</body>
+</html>

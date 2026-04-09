@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Go Internet</title>
+
+  <link rel="icon" type="image/png" href="favicon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+<link rel="icon" type="image/png" sizes="128x128" href="favicon-128.png">
+<link rel="icon" href="favicon.ico" sizes="any">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -30,7 +35,39 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
 
+.marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: marquee 18s linear infinite;
+  font-weight: 600;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Pausar quando passar o mouse (opcional, mas profissional) */
+.marquee-container:hover .marquee-text {
+  animation-play-state: paused;
+  animation: marquee 25s linear infinite;  /* lento */
+  
+}
+.marquee-text {
+  text-shadow: 0 0 8px rgba(59,130,246,0.8);
+  letter-spacing: 1px;
+}
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-primary);
@@ -46,6 +83,7 @@
       border-right: 1px solid var(--border-color);
       padding: 20px 0;
       z-index: 100;
+      overflow-y: auto;
     }
 
     .sidebar-logo {
@@ -84,6 +122,29 @@
       color: #fff;
     }
 
+    .menu-item-soon {
+      background: rgba(245,158,11,.10);
+      color: #fbbf24;
+      border: 1px dashed rgba(245,158,11,.35);
+    }
+
+    .menu-item-soon:hover {
+      background: rgba(245,158,11,.18);
+      color: #fde68a;
+    }
+
+    .soon-badge {
+      margin-left: auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(245,158,11,.18);
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
     .header {
       position: fixed;
       top: 0;
@@ -97,6 +158,7 @@
       justify-content: space-between;
       padding: 0 22px;
       z-index: 99;
+      gap: 12px;
     }
 
     .page-title {
@@ -109,6 +171,7 @@
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .filter-group {
@@ -147,6 +210,9 @@
       color: var(--accent-orange);
       font-size: 12px;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .panel-btn:hover {
@@ -158,6 +224,59 @@
       margin-top: var(--header-height);
       padding: 24px;
       min-height: calc(100vh - var(--header-height));
+    }
+
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mobile-userbar {
+      display: none;
+    }
+
+    .user-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .info-panel {
+      background: linear-gradient(135deg, rgba(59,130,246,.16), rgba(139,92,246,.10));
+      border: 1px solid rgba(59,130,246,.28);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .info-panel-title {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-panel-content {
+      color: #dbeafe;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
     }
 
     .kpi-grid {
@@ -292,6 +411,13 @@
       color: var(--accent-blue);
     }
 
+    .table-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
     .table-container {
       overflow:auto;
     }
@@ -299,7 +425,7 @@
     .data-table {
       width:100%;
       border-collapse: collapse;
-      min-width: 1100px;
+      min-width: 1250px;
     }
 
     .data-table thead {
@@ -311,6 +437,7 @@
       text-align:left;
       border-bottom: 1px solid rgba(255,255,255,.05);
       font-size: 13px;
+      vertical-align: top;
     }
 
     .data-table th {
@@ -326,6 +453,7 @@
       border-radius: 999px;
       font-size: 11px;
       font-weight: 800;
+      white-space: nowrap;
     }
 
     .status-badge.agendada { background: rgba(59,130,246,.18); color: #60a5fa; }
@@ -334,6 +462,8 @@
     .status-badge.concluida { background: rgba(16,185,129,.18); color: #34d399; }
     .status-badge.reagendada { background: rgba(245,158,11,.18); color: #fbbf24; }
     .status-badge.cancelada { background: rgba(239,68,68,.18); color: #f87171; }
+    .status-badge.pendente { background: rgba(245,158,11,.18); color: #fbbf24; }
+    .status-badge.sem_pendencia { background: rgba(16,185,129,.18); color: #34d399; }
 
     .table-btn {
       padding: 7px 10px;
@@ -345,10 +475,22 @@
       font-size: 11px;
       font-weight: 700;
       margin-right: 6px;
+      margin-bottom: 6px;
     }
 
     .table-btn:hover { background: rgba(255,109,11,.15); }
     .table-btn.delete:hover { background: rgba(239,68,68,.15); }
+
+    .readonly-note {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border-color);
+    }
 
     .form-select, .form-input, .form-textarea {
       width:100%;
@@ -358,6 +500,7 @@
       border-radius:10px;
       color:#fff;
       font-size:14px;
+      font-family: inherit;
     }
 
     .form-select option {
@@ -397,6 +540,7 @@
       justify-content:space-between;
       align-items:center;
       margin-bottom:18px;
+      gap: 12px;
     }
 
     .modal-title {
@@ -509,9 +653,57 @@
 
     @media (max-width: 768px) {
       .sidebar { display:none; }
-      .header { left:0; }
-      .main-content { margin-left:0; }
+
+      .header {
+        left:0;
+        padding: 10px 14px;
+        height: auto;
+        min-height: 68px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .main-content {
+        margin-left:0;
+        margin-top: 105px;
+        padding: 14px;
+      }
+
+      .page-title {
+        font-size: 18px;
+      }
+
+      .header-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .filter-group {
+        width: 100%;
+        overflow: auto;
+      }
+
+      .filter-btn {
+        white-space: nowrap;
+      }
+
       .form-grid { grid-template-columns: 1fr; }
+
+      .data-table { min-width: 1100px; }
+
+      .kpi-value { font-size: 28px; }
+
+      .mobile-userbar {
+        display: flex;
+        margin-bottom: 12px;
+        padding: 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -519,15 +711,23 @@
 
   <aside class="sidebar">
     <div class="sidebar-logo">
-      
-      <span>Go Internet</span>
+      <span></span>
+      <span>BACKOFFICE</span>
     </div>
 
     <nav class="sidebar-menu">
       <a href="#" class="menu-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
       <a href="#" class="menu-item"><i class="fa-solid fa-calendar-days"></i> Agenda</a>
-      <a href="#" class="menu-item"><i class="fa-solid fa-screwdriver-wrench"></i> OS</a>
-      <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Equipe</a>
+      <a href="#" class="menu-item menu-item-soon">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        OS
+        <span class="soon-badge">Em breve</span>
+      </a>
+      <a href="#" class="menu-item menu-item-soon">
+        <i class="fa-solid fa-users"></i>
+        Equipe
+        <span class="soon-badge">Em breve</span>
+      </a>
     </nav>
   </aside>
 
@@ -535,7 +735,13 @@
     <div class="page-title">Dashboard de Instalações e OS</div>
 
     <div class="header-right">
-      <div class="filter-group">
+      <div class="user-chip">
+        <i class="fa-solid fa-user"></i>
+        <span id="userNomeHeader">System Admin</span> •
+        <span id="userPerfilHeader">system_admin</span>
+      </div>
+
+      <div class="filter-group" id="periodoGroup">
         <button class="filter-btn active" data-period="dia">Dia</button>
         <button class="filter-btn" data-period="semana">Semana</button>
         <button class="filter-btn" data-period="mes">Mês</button>
@@ -549,6 +755,32 @@
   </header>
 
   <main class="main-content">
+    <div class="mobile-userbar">
+      <div><strong>Usuário:</strong> <span id="userNomeMobile">System Admin</span></div>
+      <div><strong>Perfil:</strong> <span id="userPerfilMobile">system_admin</span></div>
+    </div>
+
+    <section class="info-panel">
+      <div class="toolbar-row">
+        <div class="info-panel-title">
+          <i class="fa-solid fa-bullhorn"></i>
+          Comunicado Geral
+        </div>
+
+        <div id="comunicadoActions">
+          <button class="panel-btn" id="btnEditarComunicado">
+            <i class="fa-solid fa-pen"></i> Editar comunicado
+          </button>
+        </div>
+      </div>
+
+     <div class="info-panel-content marquee-container">
+  <div class="marquee-text" id="comunicadoTexto">
+    Nenhum comunicado cadastrado no momento.
+  </div>
+</div>
+    </section>
+
     <section class="kpi-grid">
       <div class="kpi-card blue">
         <div class="kpi-header">
@@ -641,6 +873,24 @@
           </button>
         </div>
 
+        <div class="table-filters">
+          <select class="form-select" id="filterStatusTabela" style="max-width:260px;">
+            <option value="todos">Todos os registros</option>
+            <option value="agendada">Instalações agendadas</option>
+            <option value="instalada">Instalações instaladas</option>
+            <option value="instalada_com_pendencia">Instalações com pendência</option>
+            <option value="os_com_pendencia">OS com pendência</option>
+          </select>
+
+          <input
+            type="text"
+            class="form-input"
+            id="filterBusca"
+            placeholder="Buscar por cliente, técnico ou vendedor..."
+            style="max-width:320px;"
+          >
+        </div>
+
         <div class="table-container">
           <table class="data-table">
             <thead>
@@ -653,6 +903,7 @@
                 <th>Técnico</th>
                 <th>Data</th>
                 <th>Status</th>
+                <th>Pendência</th>
                 <th>Motivo</th>
                 <th>Observações</th>
                 <th>Ações</th>
@@ -735,6 +986,19 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label">Possui pendência? *</label>
+            <select class="form-select" id="edit-possui-pendencia" required>
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </div>
+
+          <div class="form-group full" id="pendenciaDescricaoGroup" style="display:none;">
+            <label class="form-label">Descrição da pendência</label>
+            <textarea class="form-textarea" id="edit-descricao-pendencia" placeholder="Descreva a pendência encontrada..."></textarea>
+          </div>
+
+          <div class="form-group">
             <label class="form-label">Motivo</label>
             <input type="text" class="form-input" id="edit-motivo" placeholder="Ex: Cliente ausente">
           </div>
@@ -766,11 +1030,27 @@
     // URL da API do Google Apps Script
     const API_URL = 'https://script.google.com/macros/s/AKfycbyt9qhGCBIZWOSm29PikznkBMcVfJwqrDbOlvB1PTuEJE_924_crdjH90n-PaNwS5Kbrg/exec';
 
-    // Estado da aplicação
+    // Perfis
+    const PERFIS = {
+      SYSTEM_ADMIN: 'system_admin',
+      ADM: 'adm',
+      CONSULTOR: 'consultor_comercial',
+      TECNICO: 'tecnico'
+    };
+
+    // Usuário atual (simulado no front-end)
+    // IMPORTANTE: no ambiente real isso deve vir do backend/login
+    let usuarioAtual = {
+      nome: 'System Admin',
+      perfil: PERFIS.SYSTEM_ADMIN
+    };
+
+    // Estado
     let registros = [];
     let periodoAtual = 'dia';
     let chartInstalacoes = null;
     let chartMotivos = null;
+    let comunicadoGeral = localStorage.getItem('go_comunicado_geral') || 'Nenhum comunicado cadastrado no momento.';
 
     // Elementos DOM
     const modalEdit = document.getElementById('modalEdit');
@@ -785,11 +1065,14 @@
     const filterTecnico = document.getElementById('filterTecnico');
     const editCategoria = document.getElementById('edit-categoria');
     const tipoOsGroup = document.getElementById('tipoOsGroup');
+    const editPossuiPendencia = document.getElementById('edit-possui-pendencia');
+    const pendenciaDescricaoGroup = document.getElementById('pendenciaDescricaoGroup');
+    const comunicadoTexto = document.getElementById('comunicadoTexto');
 
     /* ============================================
        FUNÇÕES AUXILIARES - UI
     ============================================ */
-    
+
     function showLoading() {
       loading.classList.add('active');
     }
@@ -803,7 +1086,7 @@
       toast.className = 'toast show';
       if (type === 'success') toast.classList.add('success');
       if (type === 'error') toast.classList.add('error');
-      
+
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => {
         toast.classList.remove('show');
@@ -811,6 +1094,10 @@
     }
 
     function openModal() {
+      if (!usuarioPodeEditar()) {
+        showToast('Seu perfil possui acesso somente leitura.', 'error');
+        return;
+      }
       modalEdit.classList.add('active');
     }
 
@@ -822,14 +1109,16 @@
       form.reset();
       document.getElementById('edit-id').value = '';
       document.getElementById('edit-categoria').value = 'instalacao';
+      document.getElementById('edit-possui-pendencia').value = 'nao';
       modalTitleText.textContent = 'Novo Registro';
       alternarTipoOS();
+      alternarPendencia();
     }
 
     function alternarTipoOS() {
       const categoria = editCategoria.value;
       tipoOsGroup.style.display = categoria === 'ordem_servico' ? 'block' : 'none';
-      
+
       const tipoOsSelect = document.getElementById('edit-tipo-os');
       if (categoria !== 'ordem_servico') {
         tipoOsSelect.value = '';
@@ -839,36 +1128,130 @@
       }
     }
 
-    /* ============================================
-       FUNÇÕES AUXILIARES - DATAS
-    ============================================ */
-    
-    function toDateOnly(value) {
-      if (!value) return null;
-      
-      // Se já é um objeto Date
-      if (value instanceof Date) {
-        const d = new Date(value);
-        d.setHours(0, 0, 0, 0);
-        return d;
-      }
-      
-      // Se é uma string
-      const dateStr = String(value).trim();
-      if (!dateStr) return null;
-      
-      // Tenta parsear a data (formato YYYY-MM-DD ou DD/MM/YYYY)
-      let d;
-      if (dateStr.includes('/')) {
-        const [day, month, year] = dateStr.split('/');
-        d = new Date(year, month - 1, day);
+    function alternarPendencia() {
+      const possui = document.getElementById('edit-possui-pendencia').value;
+      const campoDescricao = document.getElementById('edit-descricao-pendencia');
+
+      if (possui === 'sim') {
+        pendenciaDescricaoGroup.style.display = 'block';
+        campoDescricao.setAttribute('required', 'required');
       } else {
-        d = new Date(dateStr + 'T00:00:00');
+        pendenciaDescricaoGroup.style.display = 'none';
+        campoDescricao.removeAttribute('required');
+        campoDescricao.value = '';
       }
-      
-      if (isNaN(d.getTime())) return null;
-      d.setHours(0, 0, 0, 0);
-      return d;
+    }
+
+    /* ============================================
+       PERMISSÕES
+    ============================================ */
+
+    function usuarioPodeFiltrarPeriodo() {
+      return [PERFIS.SYSTEM_ADMIN, PERFIS.ADM].includes(usuarioAtual.perfil);
+    }
+
+    function usuarioPodeEditar() {
+      return [PERFIS.SYSTEM_ADMIN, PERFIS.ADM].includes(usuarioAtual.perfil);
+    }
+
+    function usuarioPodeGerenciarComunicado() {
+      return [PERFIS.SYSTEM_ADMIN, PERFIS.ADM].includes(usuarioAtual.perfil);
+    }
+
+    function aplicarPermissoesUI() {
+      document.getElementById('userNomeHeader').textContent = usuarioAtual.nome;
+      document.getElementById('userPerfilHeader').textContent = usuarioAtual.perfil;
+      document.getElementById('userNomeMobile').textContent = usuarioAtual.nome;
+      document.getElementById('userPerfilMobile').textContent = usuarioAtual.perfil;
+
+      const periodoBtns = document.querySelectorAll('.filter-btn');
+      periodoBtns.forEach(btn => {
+        btn.disabled = !usuarioPodeFiltrarPeriodo();
+        btn.style.opacity = usuarioPodeFiltrarPeriodo() ? '1' : '.45';
+        btn.style.pointerEvents = usuarioPodeFiltrarPeriodo() ? 'auto' : 'none';
+      });
+
+      const btnNovo = document.getElementById('btnNovoRegistro');
+      if (btnNovo) {
+        btnNovo.style.display = usuarioPodeEditar() ? 'inline-flex' : 'none';
+      }
+
+      const filtroTabela = document.getElementById('filterStatusTabela');
+      if (filtroTabela) {
+        filtroTabela.disabled = !usuarioPodeFiltrarPeriodo();
+        filtroTabela.style.opacity = usuarioPodeFiltrarPeriodo() ? '1' : '.6';
+      }
+
+      const filtroBusca = document.getElementById('filterBusca');
+      if (filtroBusca) {
+        filtroBusca.disabled = !usuarioPodeFiltrarPeriodo();
+        filtroBusca.style.opacity = usuarioPodeFiltrarPeriodo() ? '1' : '.6';
+      }
+
+      const btnEditarComunicado = document.getElementById('btnEditarComunicado');
+      if (btnEditarComunicado) {
+        btnEditarComunicado.style.display = usuarioPodeGerenciarComunicado() ? 'inline-flex' : 'none';
+      }
+    }
+
+    /* ============================================
+       DATAS - CORREÇÃO DO BUG DE DIA ANTERIOR
+    ============================================ */
+
+    function parseDateLocal(value) {
+      if (!value) return null;
+
+      if (value instanceof Date) {
+        return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+      }
+
+      const str = String(value).trim();
+      if (!str) return null;
+
+      // YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      // DD/MM/YYYY
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('/').map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      // ISO
+      const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+      if (isoMatch) {
+        const y = Number(isoMatch[1]);
+        const m = Number(isoMatch[2]);
+        const d = Number(isoMatch[3]);
+        return new Date(y, m - 1, d);
+      }
+
+      const dt = new Date(str);
+      if (isNaN(dt.getTime())) return null;
+
+      return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    }
+
+    function formatDateForInput(value) {
+      const d = parseDateLocal(value);
+      if (!d) return '';
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatDateBR(value) {
+      const d = parseDateLocal(value);
+      if (!d) return '-';
+      return d.toLocaleDateString('pt-BR');
+    }
+
+    function toDateOnly(value) {
+      return parseDateLocal(value);
     }
 
     function isSameDay(a, b) {
@@ -879,7 +1262,7 @@
     }
 
     function startOfWeek(date) {
-      const d = new Date(date);
+      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       const day = d.getDay();
       const diff = day === 0 ? -6 : 1 - day;
       d.setDate(d.getDate() + diff);
@@ -895,6 +1278,10 @@
     }
 
     function filtrarPorPeriodo(lista) {
+      if (!usuarioPodeFiltrarPeriodo()) {
+        return [...lista];
+      }
+
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
 
@@ -911,7 +1298,7 @@
         }
 
         if (periodoAtual === 'mes') {
-          return data.getMonth() === hoje.getMonth() && 
+          return data.getMonth() === hoje.getMonth() &&
                  data.getFullYear() === hoje.getFullYear();
         }
 
@@ -924,17 +1311,75 @@
     }
 
     /* ============================================
-       FUNÇÕES DE API
+       FILTROS DA TABELA
     ============================================ */
-    
+
+    function aplicarFiltrosTabela(lista) {
+      let resultado = [...lista];
+
+      if (!usuarioPodeFiltrarPeriodo()) {
+        return resultado;
+      }
+
+      const filtroStatus = document.getElementById('filterStatusTabela')?.value || 'todos';
+      const termoBusca = (document.getElementById('filterBusca')?.value || '').trim().toLowerCase();
+
+      if (filtroStatus === 'agendada') {
+        resultado = resultado.filter(r => r.categoria === 'instalacao' && r.status === 'agendada');
+      }
+
+      if (filtroStatus === 'instalada') {
+        resultado = resultado.filter(r =>
+          r.categoria === 'instalacao' &&
+          ['instalada', 'concluida'].includes(r.status)
+        );
+      }
+
+      if (filtroStatus === 'instalada_com_pendencia') {
+        resultado = resultado.filter(r =>
+          r.categoria === 'instalacao' &&
+          ['instalada', 'concluida'].includes(r.status) &&
+          String(r.possui_pendencia || 'nao') === 'sim'
+        );
+      }
+
+      if (filtroStatus === 'os_com_pendencia') {
+        resultado = resultado.filter(r =>
+          r.categoria === 'ordem_servico' &&
+          String(r.possui_pendencia || 'nao') === 'sim'
+        );
+      }
+
+      if (termoBusca) {
+        resultado = resultado.filter(r => {
+          const texto = [
+            r.cliente || '',
+            r.tecnico || '',
+            r.vendedor || '',
+            r.tipo_os || '',
+            r.obs || '',
+            r.descricao_pendencia || ''
+          ].join(' ').toLowerCase();
+
+          return texto.includes(termoBusca);
+        });
+      }
+
+      return resultado;
+    }
+
+    /* ============================================
+       API
+    ============================================ */
+
     async function apiListar() {
       try {
         const resp = await fetch(`${API_URL}?action=list&t=${Date.now()}`);
-        
+
         if (!resp.ok) {
           throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         }
-        
+
         const data = await resp.json();
         console.log('✅ Dados recebidos:', data);
         return data;
@@ -947,19 +1392,16 @@
     async function apiSalvar(payload) {
       try {
         console.log('📤 Enviando dados:', payload);
-        
-        const resp = await fetch(API_URL, {
+
+        await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors', // Importante para Google Apps Script
+          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'save', payload })
         });
-        
-        // Com no-cors, não conseguimos ler a resposta
-        // Assumimos sucesso se não houver erro de rede
+
         console.log('✅ Dados enviados (no-cors mode)');
         return { ok: true };
-        
       } catch (error) {
         console.error('❌ Erro ao salvar:', error);
         throw error;
@@ -969,17 +1411,16 @@
     async function apiExcluir(id) {
       try {
         console.log('🗑️ Excluindo ID:', id);
-        
-        const resp = await fetch(API_URL, {
+
+        await fetch(API_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'delete', id })
         });
-        
+
         console.log('✅ Exclusão enviada (no-cors mode)');
         return { ok: true };
-        
       } catch (error) {
         console.error('❌ Erro ao excluir:', error);
         throw error;
@@ -987,25 +1428,28 @@
     }
 
     /* ============================================
-       FUNÇÃO PRINCIPAL DE CARREGAMENTO
+       CARREGAMENTO
     ============================================ */
-    
+
     async function carregarDados() {
       try {
         showLoading();
         const res = await apiListar();
-        
+
         if (res && Array.isArray(res.data)) {
-          registros = res.data;
+          registros = res.data.map(item => ({
+            ...item,
+            possui_pendencia: item.possui_pendencia || 'nao',
+            descricao_pendencia: item.descricao_pendencia || ''
+          }));
           console.log(`📊 ${registros.length} registros carregados`);
         } else {
           registros = [];
           console.warn('⚠️ Dados inválidos recebidos');
         }
-        
+
         renderizarTudo();
         showToast('Dados carregados com sucesso', 'success');
-        
       } catch (e) {
         console.error('❌ Erro completo:', e);
         showToast('Erro ao carregar dados. Verifique o console.', 'error');
@@ -1019,15 +1463,19 @@
     /* ============================================
        RENDERIZAÇÃO
     ============================================ */
-    
+
     function renderizarTudo() {
-      const dados = filtrarPorPeriodo(registros);
-      atualizarKPIs(dados);
-      atualizarTabela(dados);
-      atualizarRankingVendedores(dados);
-      atualizarRankingTecnicos(dados, filterTecnico.value);
-      atualizarGraficoInstalacoes(dados);
-      atualizarGraficoMotivos(dados);
+      comunicadoTexto.textContent = comunicadoGeral;
+
+      const dadosPeriodo = filtrarPorPeriodo(registros);
+      const dadosFiltrados = aplicarFiltrosTabela(dadosPeriodo);
+
+      atualizarKPIs(dadosPeriodo);
+      atualizarTabela(dadosFiltrados);
+      atualizarRankingVendedores(dadosPeriodo);
+      atualizarRankingTecnicos(dadosPeriodo, filterTecnico.value);
+      atualizarGraficoInstalacoes(dadosPeriodo);
+      atualizarGraficoMotivos(dadosPeriodo);
     }
 
     function atualizarKPIs(dados) {
@@ -1056,14 +1504,16 @@
       });
 
       if (!ordenados.length) {
-        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:40px;">Nenhum registro encontrado no período selecionado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:40px;">Nenhum registro encontrado.</td></tr>`;
         return;
       }
 
       ordenados.forEach(item => {
         const tr = document.createElement('tr');
         const statusClass = String(item.status || '').replace(/\s+/g, '_');
-        const dataFormatada = item.data ? toDateOnly(item.data).toLocaleDateString('pt-BR') : '-';
+        const dataFormatada = formatDateBR(item.data);
+        const pendenciaTexto = item.possui_pendencia === 'sim' ? 'Com pendência' : 'Sem pendência';
+        const pendenciaClasse = item.possui_pendencia === 'sim' ? 'pendente' : 'sem_pendencia';
 
         tr.innerHTML = `
           <td>${item.id || '-'}</td>
@@ -1074,15 +1524,21 @@
           <td>${item.tecnico || '-'}</td>
           <td>${dataFormatada}</td>
           <td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
+          <td>
+            <span class="status-badge ${pendenciaClasse}">${pendenciaTexto}</span>
+            ${item.descricao_pendencia ? `<div style="margin-top:6px; font-size:11px; color:#cbd5e1;">${item.descricao_pendencia}</div>` : ''}
+          </td>
           <td>${item.motivo || '-'}</td>
           <td>${item.obs || '-'}</td>
           <td>
-            <button class="table-btn" onclick="editarRegistro('${item.id}')">
-              <i class="fa-solid fa-pen"></i> Editar
-            </button>
-            <button class="table-btn delete" onclick="removerRegistro('${item.id}')">
-              <i class="fa-solid fa-trash"></i> Excluir
-            </button>
+            ${usuarioPodeEditar() ? `
+              <button class="table-btn" onclick="editarRegistro('${item.id}')">
+                <i class="fa-solid fa-pen"></i> Editar
+              </button>
+              <button class="table-btn delete" onclick="removerRegistro('${item.id}')">
+                <i class="fa-solid fa-trash"></i> Excluir
+              </button>
+            ` : `<span class="readonly-note">Somente leitura</span>`}
           </td>
         `;
         tbody.appendChild(tr);
@@ -1120,8 +1576,8 @@
             <div class="ranking-info">
               <div class="ranking-name"><i class="fa-solid fa-user-tie"></i> ${v.nome}</div>
               <div class="ranking-details">
-                <i class="fa-solid fa-check-circle" style="color:#10b981"></i> ${v.realizadas} 
-                | 
+                <i class="fa-solid fa-check-circle" style="color:#10b981"></i> ${v.realizadas}
+                |
                 <i class="fa-solid fa-times-circle" style="color:#ef4444"></i> ${v.naoRealizadas}
               </div>
             </div>
@@ -1273,10 +1729,15 @@
     }
 
     /* ============================================
-       FUNÇÕES DE EDIÇÃO/EXCLUSÃO
+       EDIÇÃO / EXCLUSÃO
     ============================================ */
-    
+
     function editarRegistro(id) {
+      if (!usuarioPodeEditar()) {
+        showToast('Seu perfil possui acesso somente leitura.', 'error');
+        return;
+      }
+
       const item = registros.find(r => String(r.id) === String(id));
       if (!item) {
         showToast('Registro não encontrado', 'error');
@@ -1290,16 +1751,24 @@
       document.getElementById('edit-cliente').value = item.cliente || '';
       document.getElementById('edit-vendedor').value = item.vendedor || '';
       document.getElementById('edit-tecnico').value = item.tecnico || '';
-      document.getElementById('edit-data').value = item.data || '';
+      document.getElementById('edit-data').value = formatDateForInput(item.data);
       document.getElementById('edit-status').value = item.status || 'agendada';
+      document.getElementById('edit-possui-pendencia').value = item.possui_pendencia || 'nao';
+      document.getElementById('edit-descricao-pendencia').value = item.descricao_pendencia || '';
       document.getElementById('edit-motivo').value = item.motivo || '';
       document.getElementById('edit-obs').value = item.obs || '';
 
       alternarTipoOS();
+      alternarPendencia();
       openModal();
     }
 
     async function removerRegistro(id) {
+      if (!usuarioPodeEditar()) {
+        showToast('Seu perfil não pode excluir registros.', 'error');
+        return;
+      }
+
       if (!confirm('⚠️ Deseja realmente excluir este registro?\n\nEsta ação não poderá ser desfeita.')) {
         return;
       }
@@ -1308,12 +1777,10 @@
         showLoading();
         await apiExcluir(id);
         showToast('Registro excluído com sucesso', 'success');
-        
-        // Aguarda 2 segundos antes de recarregar (tempo para o Google Sheets processar)
+
         setTimeout(async () => {
           await carregarDados();
         }, 2000);
-        
       } catch (e) {
         console.error('❌ Erro ao excluir:', e);
         showToast('Erro ao excluir. Tente novamente.', 'error');
@@ -1321,14 +1788,13 @@
       }
     }
 
-    // Expor funções globalmente
     window.editarRegistro = editarRegistro;
     window.removerRegistro = removerRegistro;
 
     /* ============================================
-       EVENT LISTENERS
+       EVENTOS
     ============================================ */
-    
+
     btnNovoRegistro.addEventListener('click', () => {
       limparFormulario();
       openModal();
@@ -1338,6 +1804,7 @@
     btnCancelarModal.addEventListener('click', closeModal);
 
     editCategoria.addEventListener('change', alternarTipoOS);
+    editPossuiPendencia.addEventListener('change', alternarPendencia);
 
     filterTecnico.addEventListener('change', () => {
       renderizarTudo();
@@ -1347,6 +1814,8 @@
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!usuarioPodeFiltrarPeriodo()) return;
+
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         periodoAtual = btn.dataset.period;
@@ -1354,13 +1823,32 @@
       });
     });
 
+    document.getElementById('filterStatusTabela').addEventListener('change', renderizarTudo);
+    document.getElementById('filterBusca').addEventListener('input', renderizarTudo);
+
+    document.getElementById('btnEditarComunicado').addEventListener('click', () => {
+      if (!usuarioPodeGerenciarComunicado()) return;
+
+      const novoTexto = prompt('Digite o comunicado geral que todos poderão visualizar:', comunicadoGeral || '');
+      if (novoTexto === null) return;
+
+      comunicadoGeral = novoTexto.trim() || 'Nenhum comunicado cadastrado no momento.';
+      localStorage.setItem('go_comunicado_geral', comunicadoGeral);
+      comunicadoTexto.textContent = comunicadoGeral;
+      showToast('Comunicado atualizado com sucesso', 'success');
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Validação adicional
+      if (!usuarioPodeEditar()) {
+        showToast('Seu perfil possui acesso somente leitura.', 'error');
+        return;
+      }
+
       const categoria = document.getElementById('edit-categoria').value;
       const tipoOs = document.getElementById('edit-tipo-os').value;
-      
+
       if (categoria === 'ordem_servico' && !tipoOs) {
         showToast('Por favor, selecione o tipo da Ordem de Serviço', 'error');
         return;
@@ -1373,13 +1861,14 @@
         cliente: document.getElementById('edit-cliente').value.trim(),
         vendedor: document.getElementById('edit-vendedor').value.trim(),
         tecnico: document.getElementById('edit-tecnico').value.trim(),
-        data: document.getElementById('edit-data').value,
+        data: formatDateForInput(document.getElementById('edit-data').value),
         status: document.getElementById('edit-status').value,
+        possui_pendencia: document.getElementById('edit-possui-pendencia').value,
+        descricao_pendencia: document.getElementById('edit-descricao-pendencia').value.trim(),
         motivo: document.getElementById('edit-motivo').value.trim(),
         obs: document.getElementById('edit-obs').value.trim()
       };
 
-      // Validações
       if (!payload.cliente) {
         showToast('Nome do cliente é obrigatório', 'error');
         return;
@@ -1395,22 +1884,25 @@
         return;
       }
 
+      if (payload.possui_pendencia === 'sim' && !payload.descricao_pendencia) {
+        showToast('Descreva a pendência encontrada', 'error');
+        return;
+      }
+
       try {
         showLoading();
         btnSalvarForm.disabled = true;
-        
+
         console.log('💾 Salvando registro:', payload);
         await apiSalvar(payload);
-        
+
         closeModal();
         showToast('Registro salvo com sucesso! Atualizando dados...', 'success');
-        
-        // Aguarda 2 segundos antes de recarregar (tempo para o Google Sheets processar)
+
         setTimeout(async () => {
           await carregarDados();
           btnSalvarForm.disabled = false;
         }, 2000);
-        
       } catch (e) {
         console.error('❌ Erro detalhado:', e);
         showToast(`Erro ao salvar: ${e.message || 'Erro desconhecido'}`, 'error');
@@ -1422,12 +1914,24 @@
     /* ============================================
        INICIALIZAÇÃO
     ============================================ */
-    
+
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 Iniciando aplicação...');
       alternarTipoOS();
+      alternarPendencia();
+      aplicarPermissoesUI();
+      comunicadoTexto.textContent = comunicadoGeral;
       carregarDados();
     });
+
+    /* ============================================
+       DEMO DE PERFIS (opcional)
+       Para testar visualmente no navegador, execute no console:
+       usuarioAtual = { nome:'ADM', perfil:'adm' }; aplicarPermissoesUI(); renderizarTudo();
+       usuarioAtual = { nome:'Consultor', perfil:'consultor_comercial' }; aplicarPermissoesUI(); renderizarTudo();
+       usuarioAtual = { nome:'Técnico', perfil:'tecnico' }; aplicarPermissoesUI(); renderizarTudo();
+    ============================================ */
+    
   </script>
 </body>
 </html>

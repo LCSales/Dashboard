@@ -12,7 +12,7 @@ function login() {
   loading.innerText = "Verificando...";
 
   setTimeout(() => {
-    if (email === "backoffice@gointernet.com.br" && senha === "Go@backoff") {
+    if (email === "backoffice@gointernet.com" && senha === "Gobackoff") {
       loading.innerText = " Entrando...";
       localStorage.setItem("login", "true");
 
